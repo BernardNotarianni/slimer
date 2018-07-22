@@ -16,7 +16,7 @@
 '''
 
 def deserialize(serialized):
-    return ListDeserializer(serialized).deserialize();
+    return ListDeserializer(serialized).deserialize()
 
 '''
  Uses Slim Serialization.  See ListSerializer for details.  Will deserialize lists of lists recursively.
@@ -46,10 +46,10 @@ class ListDeserializer(object):
         result = self.deserializeList()
         self.checkForClosedBracket()
         return result
-    
+
     def checkForClosedBracket(self):
         if (not self.charsLeft() or self.getChar() != ']'):
-            raise SlimSyntaxError("Serialized list has no ending ]");
+            raise SlimSyntaxError("Serialized list has no ending ]")
 
     def charsLeft(self):
         return self.index < len(self.serialized)
@@ -72,7 +72,7 @@ class ListDeserializer(object):
         try:
             sublist = deserialize(item)
             self.result.append(sublist)
-        except SlimSyntaxError as e:
+        except SlimSyntaxError:
             self.result.append(item)
 
     def getString(self, length):
@@ -92,16 +92,12 @@ class ListDeserializer(object):
 
     def getLength(self):
         return self.tryGetLength()
-        try:
-            return self.tryGetLength()
-        except NumberFormatException as e:
-            raise SyntaxError(e)
 
     def tryGetLength(self):
         lengthSize = 6
         lengthString = self.serialized[self.index:self.index + lengthSize]
         length = int(lengthString)
-        self.index += lengthSize;
+        self.index += lengthSize
         self.checkForColon("Length")
         return length
 

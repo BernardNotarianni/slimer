@@ -1,50 +1,59 @@
-import unittest
-import ListSerializer
-import ListDeserializer
-from ListDeserializer import deserialize
-from ListDeserializer import SlimSyntaxError
+import pytest
 
-class ListDeserializerTest(unittest.TestCase):
+from slimer.list_serializer import serialize
+from slimer.list_deserializer import deserialize
+from slimer.list_deserializer import SlimSyntaxError
 
-    def setUp(self):
-        self.data = []
-        
-    def check(self):
-        serialized = ListSerializer.serialize(self.data)
-        deserialized = deserialize(serialized)
-        self.assertEquals(self.data, deserialized)
 
-    def testCantDeseriailzeNullString(self):
-        self.assertRaises(SlimSyntaxError, ListDeserializer.deserialize, None)
+@pytest.fixture
+def data():
+    return []
 
-    def testCantDeserializeEmptyString(self):
-        self.assertRaises(SlimSyntaxError, ListDeserializer.deserialize, '')
+def check(data):
+    serialized = serialize(data)
+    deserialized = deserialize(serialized)
+    assert data == deserialized
 
-    def testCantDeserializeStringThatDoesntStartWithBracket(self):
-        self.assertRaises(SlimSyntaxError, ListDeserializer.deserialize, 'hello')
 
-    def testCantDeserializeStringThatDoesntEndWithBracket(self):
-        self.assertRaises(SlimSyntaxError, ListDeserializer.deserialize, '[000000:')
+def testCantDeseriailzeNullString(data):
+    with pytest.raises(SlimSyntaxError):
+        deserialize(None)
 
-    def testEmptyList(self):
-        self.check()
 
-    def testListWithOneElement(self):
-        self.data.append("hello")
-        self.check()
+def testCantDeserializeEmptyString(data):
+    with pytest.raises(SlimSyntaxError):
+        deserialize('')
 
-    def testListWithTwoElements(self):
-        self.data.append("hello")
-        self.data.append("world")
-        self.check()
 
-    def testListWithSubList(self):
-        sublist = []
-        sublist.append("hello");
-        sublist.append("world");
-        self.data.append(sublist);
-        self.data.append("single");
-        self.check();
+def testCantDeserializeStringThatDoesntStartWithBracket(data):
+    with pytest.raises(SlimSyntaxError):
+        deserialize('hello')
 
-if __name__ == '__main__':
-    unittest.main()
+
+def testCantDeserializeStringThatDoesntEndWithBracket(data):
+    with pytest.raises(SlimSyntaxError):
+        deserialize('[000000:')
+
+
+def testEmptyList(data):
+    check(data)
+
+
+def testListWithOneElement(data):
+    data.append("hello")
+    check(data)
+
+
+def testListWithTwoElements(data):
+    data.append("hello")
+    data.append("world")
+    check(data)
+
+
+def testListWithSubList(data):
+    sublist = []
+    sublist.append("hello")
+    sublist.append("world")
+    data.append(sublist)
+    data.append("single")
+    check(data)
